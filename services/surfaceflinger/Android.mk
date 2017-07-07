@@ -164,7 +164,7 @@ ifeq ($(TARGET_USES_QCOM_BSP), true)
     ExSurfaceFlinger/ExLayer.cpp \
     ExSurfaceFlinger/ExSurfaceFlinger.cpp \
     ExSurfaceFlinger/ExVirtualDisplaySurface.cpp \
-    ExSurfaceFlinger/ExHWComposer.cp
+    ExSurfaceFlinger/ExHWComposer.cpp
 
     LOCAL_CFLAGS += -DQTI_BSP
 
