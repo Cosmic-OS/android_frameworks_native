@@ -3657,6 +3657,11 @@ status_t SurfaceFlinger::createLayer(
                     uniqueName, w, h, flags,
                     handle, &layer);
             break;
+        case ISurfaceComposerClient::eFXSurfaceContainer:
+            result = createContainerLayer(client,
+                    uniqueName, w, h, flags,
+                    handle, &layer);
+            break;
         default:
             result = BAD_VALUE;
             break;
@@ -3747,6 +3752,16 @@ status_t SurfaceFlinger::createColorLayer(const sp<Client>& client,
     *handle = (*outLayer)->getHandle();
     return NO_ERROR;
 }
+
+status_t SurfaceFlinger::createContainerLayer(const sp<Client>& client,
+        const String8& name, uint32_t w, uint32_t h, uint32_t flags,
+        sp<IBinder>* handle, sp<Layer>* outLayer)
+{
+    *outLayer = new ContainerLayer(this, client, name, w, h, flags);
+    *handle = (*outLayer)->getHandle();
+    return NO_ERROR;
+}
+
 
 status_t SurfaceFlinger::onLayerRemoved(const sp<Client>& client, const sp<IBinder>& handle)
 {
@@ -4430,6 +4445,12 @@ void SurfaceFlinger::dumpAllLocked(const Vector<String16>& args, size_t& index,
     result.append("\n");
 
     /*
+     * Tracing state
+     */
+    mTracing.dump(result);
+    result.append("\n");
+
+    /*
      * HWC layer minidump
      */
     for (size_t d = 0; d < mDisplays.size(); d++) {
@@ -4776,12 +4797,12 @@ status_t SurfaceFlinger::onTransact(
             case 1025: { // Set layer tracing
                 n = data.readInt32();
                 if (n) {
-                    ALOGV("LayerTracing enabled");
+                    ALOGD("LayerTracing enabled");
                     mTracing.enable();
                     doTracing("tracing.enable");
                     reply->writeInt32(NO_ERROR);
                 } else {
-                    ALOGV("LayerTracing disabled");
+                    ALOGD("LayerTracing disabled");
                     status_t err = mTracing.disable();
                     reply->writeInt32(err);
                 }
